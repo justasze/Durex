@@ -13,6 +13,8 @@
 # include <sys/stat.h>
 # include <sys/time.h>
 # include <sys/types.h>
+# include <stdio.h>
+# include <fcntl.h>
 # include "libft.h"
 
 # define PAYLOAD_PORT 4242
