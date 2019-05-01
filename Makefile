@@ -3,25 +3,25 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ndombre <marvin@42.fr>                     +#+  +:+       +#+         #
+#    By: justasze <justasze@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/02/28 00:00:12 by ndombre           #+#    #+#              #
-#    Updated: 2019/05/01 18:27:44 by ndombre          ###   ########.fr        #
+#    Updated: 2019/05/01 21:15:19 by justasze         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 TMP = tmp/
 
-SRC = durex_deamon.c main.c
+SRC = durex_daemon.c main.c durex_init.c
 OBJ = $(addprefix $(TMP), $(SRC:.c=.o))
 
-SRC_DEAMON = main_deamon.c
-OBJ_DEAMON = $(addprefix $(TMP), $(SRC_DEAMON:.c=.o))
+SRC_DAEMON = main_daemon.c
+OBJ_DAEMON = $(addprefix $(TMP), $(SRC_DAEMON:.c=.o))
 
 DEP = $(OBJ:.o=.d) $(OBJ_DEMON:.o=.d)
 
 NAME = Durex
-NAME_DEAMON = $(TMP)/durex_deamon
+NAME_DAEMON = $(TMP)/durex_daemon
 
 CFLAGS = 
 
@@ -30,13 +30,19 @@ all: $(NAME)
 $(NAME): $(OBJ) libft/libft.a
 	gcc -Wall -Werror -Wextra -o $@ $^
 
-$(NAME_DEAMON): $(OBJ_DEAMON) libft/libft.a
+$(NAME_DAEMON): $(OBJ_DAEMON) libft/libft.a
 	gcc -Wall -Werror -Wextra -o $@ $^
 
-$(TMP)durex_deamon.c: $(NAME_DEAMON)
-	(cd $(TMP) ; xxd -i durex_deamon durex_deamon.c)
+$(TMP)durex_daemon.c: $(NAME_DAEMON)
+	(cd $(TMP) ; xxd -i durex_daemon durex_daemon.c)
 
-$(TMP)durex_deamon.o: $(TMP)durex_deamon.c | $(TMP)
+$(TMP)durex_daemon.o: $(TMP)durex_daemon.c | $(TMP)
+	gcc -Wall -Werror -Wextra -I includes -I libft -MD -c -o $@ $<
+
+$(TMP)durex_init.c: Durex.init
+	xxd -i $< $@
+
+$(TMP)durex_init.o: $(TMP)durex_init.c | $(TMP)
 	gcc -Wall -Werror -Wextra -I includes -I libft -MD -c -o $@ $<
 
 $(TMP)%.o: srcs/%.c | $(TMP)

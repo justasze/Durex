@@ -20,6 +20,7 @@
 # define PAYLOAD_PORT 4242
 # define MAX_CLIENTS 3
 # define PAYLOAD_PATH "/bin/Durex"
+# define INIT_PATH "/etc/init.d/Durex"
 # define TROJAN_STR "ndombre / justasze"
 
 #endif
