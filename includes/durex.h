@@ -1,0 +1,25 @@
+#ifndef DUREX_H
+
+# define DUREX_H
+
+# include <unistd.h>
+# include <stdlib.h>
+# include <arpa/inet.h>
+# include <netdb.h>
+# include <netinet/in.h>
+# include <netinet/ip_icmp.h>
+# include <sys/param.h>
+# include <sys/socket.h>
+# include <sys/stat.h>
+# include <sys/time.h>
+# include <sys/types.h>
+# include "libft.h"
+
+# define PAYLOAD_PORT 4242
+# define MAX_CLIENTS 3
+# define PAYLOAD_CODE "" // TODO: Insert whole ELF here.
+# define PAYLOAD_SIZE 9999 // TODO: Insert ELF size_here
+# define PAYLOAD_PATH "/bin/Durex"
+# define TROJAN_STR "ndombre / justasze"
+
+#endif

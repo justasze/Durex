@@ -1,0 +1,32 @@
+The final program is simple:
+
+-> It needs to be root (getuid)
+
+-> It seems to only write our login on stdout.
+
+-> Meanwhile, it creates a binary (named durex too), and puts it with all other system's binaries (/bin/ on unix).
+
+-> The new binary must be launched automalically at boot time. We can do that however we want.
+
+Payload:
+
+-> Is a daemon.
+
+-> Only once instance can be launched simultaneously (may use a lock file).
+
+-> Opens port 4242
+
+-> Allows 3 simultaneous connexions.
+
+-> Works with a system of password (must NOT be stored in clear).
+
+-> Provides a remote (root) shell with the comman "shell".
+
+-> Must be invisible (no errors must appear, nothing should appear suspicious)
+
+Quick bonus ideas:
+
+-> Hide the payload
+-> Use ICMP to trasmit data (?)
+-> Use DNS
+-> Make a client to have encrypted exchanges
