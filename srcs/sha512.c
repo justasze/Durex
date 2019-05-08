@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   sha256.c                                           :+:      :+:    :+:   */
+/*   sha512.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ndombre <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: justasze <justasze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 15:53:27 by ndombre           #+#    #+#             */
-/*   Updated: 2019/03/03 16:08:57 by ndombre          ###   ########.fr       */
+/*   Updated: 2019/05/08 17:23:44 by justasze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ssl.h"
+#include "durex.h"
 
 static const uint64_t	g_k[] = {
 	0x428a2f98d728ae22, 0x7137449123ef65cd, 0xb5c0fbcfec4d3b2f,
@@ -53,6 +53,26 @@ static const uint64_t	g_init[] = {
 	0x510e527fade682d1, 0x9b05688c2b3e6c1f, 0x1f83d9abfb41bd6b,
 	0x5be0cd19137e2179
 };
+
+static uint64_t			ror_64(uint64_t value, uint8_t count)
+{
+	return (value >> count | value << (64 - count));
+}
+
+static uint64_t			conv_bigendian_64(uint64_t value)
+{
+	const uint8_t *p = (uint8_t*)&value;
+
+	//return (value);
+	return ((uint64_t)p[0] << 56
+			| (uint64_t)p[1] << 48
+			| (uint64_t)p[2] << 40
+			| (uint64_t)p[3] << 32
+			| (uint64_t)p[4] << 24
+			| (uint64_t)p[5] << 16
+			| (uint64_t)p[6] << 8
+			| (uint64_t)p[7]);
+}
 
 static void				sha512_transform_init(uint64_t *data, uint64_t w[80])
 {
@@ -120,7 +140,7 @@ void					sha512_transform(uint64_t out[8], uint64_t *data)
 	out[7] += out_save[7];
 }
 
-uint64_t				sha512_get_block(void *in, uint64_t size, uint8_t **out)
+static uint64_t			sha512_get_block(void *in, uint64_t size, uint8_t **out)
 {
 	uint64_t	new_len;
 

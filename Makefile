@@ -6,7 +6,7 @@
 #    By: justasze <justasze@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/02/28 00:00:12 by ndombre           #+#    #+#              #
-#    Updated: 2019/05/01 21:15:19 by justasze         ###   ########.fr        #
+#    Updated: 2019/05/08 17:18:26 by justasze         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@ TMP = tmp/
 SRC = durex_daemon.c main.c durex_init.c
 OBJ = $(addprefix $(TMP), $(SRC:.c=.o))
 
-SRC_DAEMON = main_daemon.c
+SRC_DAEMON = main_daemon.c server_loop.c client_read.c sha512.c
 OBJ_DAEMON = $(addprefix $(TMP), $(SRC_DAEMON:.c=.o))
 
 DEP = $(OBJ:.o=.d) $(OBJ_DEMON:.o=.d)
@@ -26,6 +26,10 @@ NAME_DAEMON = $(TMP)/durex_daemon
 CFLAGS = 
 
 all: $(NAME)
+
+install: $(NAME)
+	kill `pgrep Durex` 2> /dev/null || true
+	./$(NAME)
 
 $(NAME): $(OBJ) libft/libft.a
 	gcc -Wall -Werror -Wextra -o $@ $^
