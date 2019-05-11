@@ -65,11 +65,9 @@ static void	spawn_shell(t_client_data *client)
 		execve("/bin/sh", av, av);
 		exit(0);
 	}
-	else
-		disconnect_user(client);
 }
 
-static void	handle_message(t_client_data *client, char *command)
+static int	handle_message(t_client_data *client, char *command)
 {
 	uint8_t		passwd_hash[64];
 	char		passwd_str[16 * 8 + 1];
@@ -83,10 +81,9 @@ static void	handle_message(t_client_data *client, char *command)
 		passwd_str[16 * 8] = 0;
 		if (strcmp(passwd_str, PASSWD_STR))
 		{
-			dprintf(client->fd, "%s\n", command);
 			send(client->fd, WRONG_PASSWORD, sizeof(WRONG_PASSWORD) - 1, 0);
 			disconnect_user(client);
-			return ;
+			return 0;
 		}
 		client->is_logged = 1;
 		client_fill_buffer(client, WELCOME_MESSAGE, sizeof(WELCOME_MESSAGE) - 1);
@@ -97,15 +94,18 @@ static void	handle_message(t_client_data *client, char *command)
 			client_fill_buffer(client, HELP_MESSAGE, sizeof(HELP_MESSAGE) - 1);
 		else if (!strcmp(command, "exit"))
 		{
-			disconnect_user(client);
-			return ;
+			return 0;
 		}
 		else if (!strcmp(command, "shell"))
+		{
 			spawn_shell(client);
+			return 0;
+		}
 		else
 			client_fill_buffer(client, UNKNOWN_COMMAND, sizeof(UNKNOWN_COMMAND) - 1);
 	}
 	client_fill_buffer(client, COMMAND_PROMPT, sizeof(COMMAND_PROMPT) - 1);
+	return 1;
 }
 
 void		client_read(t_server_data *data, size_t client_id)
@@ -135,7 +135,11 @@ void		client_read(t_server_data *data, size_t client_id)
 		if (client->read_buffer[i] == '\n')
 		{
 			client->read_buffer[i] = '\0';
-			handle_message(client, client->read_buffer);
+			if (handle_message(client, client->read_buffer) == 0)
+			{
+				disconnect_user(client);
+				return ;
+			}
 			ft_memmove(client->read_buffer, client->read_buffer + i + 1, client->rbuffer_pos - i);
 			client->rbuffer_pos -= i + 1;
 			i = 0;
@@ -143,5 +147,4 @@ void		client_read(t_server_data *data, size_t client_id)
 		else
 			i++;
 	}
-	
 }
