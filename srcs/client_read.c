@@ -46,7 +46,7 @@ static void	client_fill_buffer(t_client_data *client, char *msg, size_t len)
 	}
 }
 
-static void	spawn_shell(t_client_data *client)
+static void	spawn_shell(t_server_data *server, t_client_data *client)
 {
 	pid_t	pid;
 	char	*av[] = {NULL};
@@ -59,6 +59,9 @@ static void	spawn_shell(t_client_data *client)
 	}
 	if (pid == 0)
 	{
+		for (size_t i = 0; i < MAX_CLIENTS; i++)
+			if (server->clients[i].fd != client->fd && server->clients[i].fd >= 0)
+				close(server->clients[i].fd);
 		dup2(client->fd, 2);
 		dup2(client->fd, 1);
 		dup2(client->fd, 0);
@@ -67,7 +70,7 @@ static void	spawn_shell(t_client_data *client)
 	}
 }
 
-static int	handle_message(t_client_data *client, char *command)
+static int	handle_message(t_server_data *server, t_client_data *client, char *command)
 {
 	uint8_t		passwd_hash[64];
 	char		passwd_str[16 * 8 + 1];
@@ -93,12 +96,10 @@ static int	handle_message(t_client_data *client, char *command)
 		if (!strcmp(command, "help"))
 			client_fill_buffer(client, HELP_MESSAGE, sizeof(HELP_MESSAGE) - 1);
 		else if (!strcmp(command, "exit"))
-		{
 			return 0;
-		}
 		else if (!strcmp(command, "shell"))
 		{
-			spawn_shell(client);
+			spawn_shell(server, client);
 			return 0;
 		}
 		else
@@ -135,7 +136,7 @@ void		client_read(t_server_data *data, size_t client_id)
 		if (client->read_buffer[i] == '\n')
 		{
 			client->read_buffer[i] = '\0';
-			if (handle_message(client, client->read_buffer) == 0)
+			if (handle_message(data, client, client->read_buffer) == 0)
 			{
 				disconnect_user(client);
 				return ;
