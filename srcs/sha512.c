@@ -6,7 +6,7 @@
 /*   By: justasze <justasze@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/02/27 15:53:27 by ndombre           #+#    #+#             */
-/*   Updated: 2019/05/08 17:23:44 by justasze         ###   ########.fr       */
+/*   Updated: 2019/05/11 14:42:41 by justasze         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,6 @@ static uint64_t			conv_bigendian_64(uint64_t value)
 {
 	const uint8_t *p = (uint8_t*)&value;
 
-	//return (value);
 	return ((uint64_t)p[0] << 56
 			| (uint64_t)p[1] << 48
 			| (uint64_t)p[2] << 40

